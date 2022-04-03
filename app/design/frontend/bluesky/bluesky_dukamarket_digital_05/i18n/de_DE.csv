@@ -16431,3 +16431,7 @@ formElements/*[name(.)=../../@formElement]/settings/title,module,Magento_Ui
 "First character must be letter.","Erstes Zeichen muss ein Buchstabe sein.",lib,web
 "The password can't be the same as the email address. Create a new password and try again.","Das Passwort kann nicht dieselbe wie die E-Mail-Adresse sein. Erstellen Sie ein neues Passwort und versuchen Sie es erneut.",lib,web
 
+"My Account", "Account"
+"Favorite", "Favorit"
+"My Wish List","Wunschliste"
+"My Cart","Warenkorb"
