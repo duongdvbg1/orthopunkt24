@@ -16435,3 +16435,5 @@ formElements/*[name(.)=../../@formElement]/settings/title,module,Magento_Ui
 "Favorite", "Favorit"
 "My Wish List","Wunschliste"
 "My Cart","Warenkorb"
+"All Categories","Alle Kategorien"
+"Recommended For You","Für dich empfohlen"
