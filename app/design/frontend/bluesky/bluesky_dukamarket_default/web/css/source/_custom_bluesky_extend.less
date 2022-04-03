@@ -9,7 +9,7 @@
 @font-weight__semibold: @heading__font-weight__base;
 @font-weight__bold: @heading__font-weight__base;
 // Topbar
-// ===================
+// =================== 
 
 @topbarbg: #263c97;
 @topbarcolor: @color-white;
@@ -18,12 +18,12 @@
 //===================
 @header__background-color: #263c97;
 @header_shadow: false;
-@header-icons-color: @color-white;
+@header-icons-color: #333;
 @header-icons-color-hover: @theme__color__primary;
 @header_padding: 30px; // Make header height bigger than menu height
 @header-border-color: fade(@color-white, 15%);
 
-@header_sticky_bg: @header__background-color;
+@header_sticky_bg: @header__background-color; 
 @header_sticky_border: false;
 @headerpadding: 0;
 
@@ -1046,73 +1046,6 @@
 						    right: 0;
 						    width: 30px;
 						    left: auto;
-						}
-					}
-				}
-			}
-		}
-	}
-	.page-wrapper {
-		.page-header {
-			.layout-7 , .layout-8{
-				.menu-bottom {
-					.navigation:not(.mobile-style) {
-						.level0 {
-							>.level-top {
-								padding-top: 0;
-								padding-bottom: 0;
-
-								&:before {
-									content: "";
-									position: absolute;
-									bottom: 15px;
-									width: 0;
-									left: @navigation-desktop-level0-item__padding;
-									height: @navigation-desktop-level0-item__active__border-width;
-									background-color: @navigation-desktop-level0-item__active__border-color;
-									@transition: all 0.4s ease;
-									.lib-css(transition, @transition, @_prefix: 1);
-								}
-
-								&:hover {
-									&:before {
-										width: calc(100% ~"-"(12px * 2));
-										right: 0;
-										left: @navigation-desktop-level0-item__padding;
-									}
-								}
-							}
-
-							&:first-child {
-								>.level-top {
-									&:hover {
-										&:before {
-											left: 0;
-											width: calc(100% ~"-"12px);
-										}
-									}
-								}
-
-								&.active {
-									>.level-top {
-										&:before {
-											width: calc(100% ~"-"12px);
-											right: 0;
-											left: 0;
-										}
-									}
-								}
-							}
-
-							&.active,
-							&.has-active {
-								>.level-top {
-									&:before {
-										width: calc(100% ~"-"(12px * 2));
-										right: 0;
-									}
-								}
-							}
 						}
 					}
 				}
