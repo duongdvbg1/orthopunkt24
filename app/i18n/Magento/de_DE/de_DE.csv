@@ -16430,3 +16430,4 @@ formElements/*[name(.)=../../@formElement]/settings/title,module,Magento_Ui
 "The widget %1 is no longer available. Select a different widget.","Das Widget %1 ist nicht mehr verfügbar. Wählen Sie ein anderes Widget.",lib,web
 "First character must be letter.","Erstes Zeichen muss ein Buchstabe sein.",lib,web
 "The password can't be the same as the email address. Create a new password and try again.","Das Passwort kann nicht dieselbe wie die E-Mail-Adresse sein. Erstellen Sie ein neues Passwort und versuchen Sie es erneut.",lib,web
+
