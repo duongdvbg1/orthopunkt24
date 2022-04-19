@@ -151,8 +151,11 @@ $_postCollection = $block->getPostCollection();
         ], function ($) {
 			$(".block-recent-posts .owl-carousel").owlCarousel({
                 items: 4,
-                autoplay: true,
+                autoplay: false,
                 margin: 20,
+				loop: false,
+                nav: false,
+                dots: false,
                 responsive: {
                     0: {
                         items:1
