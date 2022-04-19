@@ -149,11 +149,10 @@ $_postCollection = $block->getPostCollection();
             'jquery',
             'owl.carousel/owl.carousel.min'
         ], function ($) {
-           $(".block-recent-posts .owl-carousel").owlCarousel({
+			var owl_5 = $(".block-recent-posts .owl-carousel").owlCarousel({
                 items: 4,
                 autoplay: true,
                 margin: 20,
-
                 responsive: {
                     0: {
                         items:1
