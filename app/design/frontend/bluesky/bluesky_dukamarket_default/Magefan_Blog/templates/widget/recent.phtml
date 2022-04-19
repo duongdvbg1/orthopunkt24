@@ -141,7 +141,12 @@ $_postCollection = $block->getPostCollection();
 											</a>
 											<?php if ($_post->isPublishDateEnabled()) { ?>
 												<div class="item post-posed-date hidden-xs"> 
-													<span class="value"><span class="value"><?= $block->escapeHtml(date('M d Y', strtotime($_post->getPublishDate()))) ?></span></span>
+													<span class="value">
+													<?php 
+														$date = $_post->getPublishTime();
+													?>
+													<span class="date"><?php echo date('d', strtotime($_post->getPublishTime())); ?> <?php echo date('M', strtotime($_post->getPublishTime())); ?></span>		
+													</span>
 												</div>
 											<?php } ?>
 										</div>
@@ -153,4 +158,32 @@ $_postCollection = $block->getPostCollection();
 				</div>
 		</div>
 	</div>
+
+	<script>
+        require([
+            'jquery',
+            'owl.carousel/owl.carousel.min'
+        ], function ($) {
+           $(".widget.recent-posts .owl-carousel").owlCarousel({
+                items: 4,
+                autoplay: true,
+                margin: 20,
+
+                responsive: {
+                    0: {
+                        items:1
+                    },
+                    768: {
+                        items:2
+                    },
+                    992: {
+                        items:3
+                    },
+                    1200: {
+                        items:4
+                    }
+                }
+            });
+        });
+    </script>
 	<?php } ?>
