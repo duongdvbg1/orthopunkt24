@@ -6,7 +6,7 @@ $_product = $block->getProduct();
 $items = $block->getQuoteItem();
 ?>
 <div class="wrapper-success">
-	<div class="pupup-suc-added-to-your-bag"><?php echo __('Added to your bag');?></div>
+	<div class="pupup-suc-added-to-your-bag"><?php echo __('Zum Warenkorb hinzugefügt');?></div>
     <div class="product-information">
         <?php echo $block->getChildHtml('product_image'); ?>
 		<div class="product-infor">
@@ -27,6 +27,6 @@ $items = $block->getQuoteItem();
     </div>
     <div class="ajaxsuite-buttons">
         <button id="button_continue_shopping"><?= __('Continue Shopping'); ?></button>
-        <button onclick="window.location.href='<?php echo $this->getUrl('checkout/cart'); ?>';"><?= __('View Cart'); ?></button>
+        <button onclick="window.location.href='<?php echo $this->getUrl('checkout/cart'); ?>';"><?= __('Warenkorb ansehen'); ?></button>
     </div>
 </div>

@@ -108,21 +108,6 @@ $_postCollection = $block->getPostCollection();
 												</a>
 											</h3>
 										</div>
-										<div class="post-info">
-											<?php if ($_author = $_post->getAuthor()) { ?>
-											<div class="item post-author">
-												<span class="label"><?= $block->escapeHtml(__('Post by:')) ?></span>
-												<span class="value">
-													<a title="<?= $block->escapeHtml($_author->getTitle()) ?>"
-													   href="<?= $block->escapeUrl($_author->getAuthorUrl()) ?>">
-
-													<?= $block->escapeHtml($_author->getTitle()) ?>
-
-													</a>
-												</span>
-											</div>
-											<?php } ?>
-										</div>
 									</div>
 									<div class="post-content">
 										<div class="post-description clearfix">
@@ -137,11 +122,16 @@ $_postCollection = $block->getPostCollection();
 											   href="<?= /*@noEscape*/ $_postUrl ?>"
 											   title="<?= /*@noEscape*/ $_postName ?>"
 											   >
-												<?= $block->escapeHtml(__('Read more')) ?>
+												<?= $block->escapeHtml(__('Weiterlesen')) ?>
 											</a>
 											<?php if ($_post->isPublishDateEnabled()) { ?>
 												<div class="item post-posed-date hidden-xs"> 
-													<span class="value"><span class="value"><?= $block->escapeHtml(date('M d Y', strtotime($_post->getPublishDate()))) ?></span></span>
+													<span class="value">
+													<?php 
+														$date = $_post->getPublishTime();
+													?>
+													<span class="date"><?php echo date('d', strtotime($_post->getPublishTime())); ?> <?php echo date('M', strtotime($_post->getPublishTime())); ?></span>		
+													</span>
 												</div>
 											<?php } ?>
 										</div>
@@ -153,4 +143,34 @@ $_postCollection = $block->getPostCollection();
 				</div>
 		</div>
 	</div>
+
+	<script>
+        require([
+            'jquery',
+            'rokanthemes/owl'
+        ], function ($) {
+			$(".block-recent-posts .owl-carousel").owlCarousel({
+                items: 4,
+                autoplay: false,
+                margin: 20,
+				loop: false,
+                nav: false,
+                dots: false,
+                responsive: {
+                    0: {
+                        items:1
+                    },
+                    768: {
+                        items:2
+                    },
+                    992: {
+                        items:3
+                    },
+                    1200: {
+                        items:4
+                    }
+                }
+            });
+        });
+    </script>
 	<?php } ?>
