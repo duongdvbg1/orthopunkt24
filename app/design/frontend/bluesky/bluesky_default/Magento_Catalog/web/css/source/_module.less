@@ -39,6 +39,21 @@
 
 & when (@media-common = true) {
 
+    .tax-details {
+        font-size: 13px;
+        margin-top: 10px;
+        display: none;
+        a {
+            color: #999;
+            &:hover {
+                color: #1bc6bd;
+            }
+        }
+        .product-info-price & {
+            display: block;
+        }
+    }
+
     //
     //  Category view
     //  ---------------------------------------------
