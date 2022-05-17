@@ -22,6 +22,6 @@ class Success extends \Magento\Catalog\Block\Product\View
     }
     public function getFormatedPrice($price)
     {
-        return $this->taxHelper->getTaxPrice($product, $product->getFinalPrice(), true);
+        return $this->priceCurrency->convertAndFormat($price);
     }
 }
