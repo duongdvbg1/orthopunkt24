@@ -77,8 +77,8 @@ class PageDesignTest extends AbstractBackendController
     {
         Bootstrap::getObjectManager()->configure([
             'preferences' => [
-                CustomLayoutManagerInterface::class =>
-                    CustomLayoutManager::class
+                \Magento\Cms\Model\Page\CustomLayoutManagerInterface::class =>
+                    \Magento\TestFramework\Cms\Model\CustomLayoutManager::class
             ]
         ]);
         parent::setUp();
@@ -115,7 +115,7 @@ class PageDesignTest extends AbstractBackendController
     {
         if (!empty($this->pagesToDelete)) {
             /** @var UrlRewriteCollectionFactory $urlRewriteCollectionFactory */
-            $urlRewriteCollectionFactory = Bootstrap::getObjectManager()->get(
+            $urlRewriteCollectionFactory = \Magento\TestFramework\Helper\Bootstrap::getObjectManager()->get(
                 UrlRewriteCollectionFactory::class
             );
             /** @var UrlRewriteCollection $urlRewriteCollection */
@@ -270,37 +270,6 @@ class PageDesignTest extends AbstractBackendController
         $this->assertEmpty($updated->getCustomLayoutUpdateXml());
         $this->assertEmpty($updated->getLayoutUpdateXml());
         $this->pagesToDelete = ['test_custom_layout_page_1'];
-    }
-
-    /**
-     * Test create CMS page with invalid URL
-     *
-     * @return void
-     */
-    public function testSaveWithInlavidIdentifier(): void
-    {
-        $identifier = 'admin';
-        $reservedWords = 'admin, soap, rest, graphql, standard';
-        //Expected list of sessions messages collected throughout the controller calls.
-        $sessionMessages = [sprintf(
-            'URL key "%s" matches a reserved endpoint name (%s). Use another URL key.',
-            $identifier,
-            $reservedWords
-        )];
-        $requestData = [
-            PageInterface::IDENTIFIER => $identifier,
-            PageInterface::TITLE => 'page title',
-            PageInterface::CUSTOM_THEME => '1',
-            PageInterface::PAGE_LAYOUT => 'empty',
-        ];
-
-        $this->getRequest()->setMethod(HttpRequest::METHOD_POST);
-        $this->getRequest()->setPostValue($requestData);
-        $this->dispatch($this->uri);
-        $this->assertSessionMessages(
-            self::equalTo($sessionMessages),
-            MessageInterface::TYPE_ERROR
-        );
     }
 
     /**

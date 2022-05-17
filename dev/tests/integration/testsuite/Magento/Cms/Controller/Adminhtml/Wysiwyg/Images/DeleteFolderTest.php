@@ -6,10 +6,8 @@
 
 namespace Magento\Cms\Controller\Adminhtml\Wysiwyg\Images;
 
-use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Framework\App\Filesystem\DirectoryList;
 use Magento\Framework\App\Response\HttpFactory as ResponseFactory;
-use Magento\Framework\Filesystem\Driver\File;
 
 /**
  * Test for \Magento\Cms\Controller\Adminhtml\Wysiwyg\Images\DeleteFolder class.
@@ -18,19 +16,6 @@ use Magento\Framework\Filesystem\Driver\File;
  */
 class DeleteFolderTest extends \PHPUnit\Framework\TestCase
 {
-    private const MEDIA_GALLERY_IMAGE_FOLDERS_CONFIG_PATH
-        = 'system/media_storage_configuration/allowed_resources/media_gallery_image_folders';
-
-    /**
-     * @var array
-     */
-    private $origConfigValue;
-
-    /**
-     * @var \Magento\Framework\ObjectManagerInterface
-     */
-    private $objectManager;
-
     /**
      * @var \Magento\Cms\Controller\Adminhtml\Wysiwyg\Images\DeleteFolder
      */
@@ -66,39 +51,14 @@ class DeleteFolderTest extends \PHPUnit\Framework\TestCase
      */
     protected function setUp(): void
     {
-        $this->objectManager = \Magento\TestFramework\Helper\Bootstrap::getObjectManager();
-        $this->filesystem = $this->objectManager->get(\Magento\Framework\Filesystem::class);
+        $objectManager = \Magento\TestFramework\Helper\Bootstrap::getObjectManager();
+        $this->filesystem = $objectManager->get(\Magento\Framework\Filesystem::class);
         $this->mediaDirectory = $this->filesystem->getDirectoryWrite(DirectoryList::MEDIA);
         /** @var \Magento\Cms\Helper\Wysiwyg\Images $imagesHelper */
-        $this->imagesHelper = $this->objectManager->get(\Magento\Cms\Helper\Wysiwyg\Images::class);
+        $this->imagesHelper = $objectManager->get(\Magento\Cms\Helper\Wysiwyg\Images::class);
         $this->fullDirectoryPath = $this->imagesHelper->getStorageRoot();
-        $this->mediaDirectory->create($this->mediaDirectory->getRelativePath($this->fullDirectoryPath));
-        $this->responseFactory = $this->objectManager->get(ResponseFactory::class);
-        $this->model = $this->objectManager->get(\Magento\Cms\Controller\Adminhtml\Wysiwyg\Images\DeleteFolder::class);
-        $config = $this->objectManager->get(ScopeConfigInterface::class);
-        $this->origConfigValue = $config->getValue(
-            self::MEDIA_GALLERY_IMAGE_FOLDERS_CONFIG_PATH,
-            'default'
-        );
-        $scopeConfig = $this->objectManager->get(\Magento\Framework\App\Config\MutableScopeConfigInterface::class);
-        $scopeConfig->setValue(
-            self::MEDIA_GALLERY_IMAGE_FOLDERS_CONFIG_PATH,
-            array_merge($this->origConfigValue, ['testDir']),
-        );
-    }
-
-    protected function tearDown(): void
-    {
-        $directoryName = 'testDir';
-        $this->mediaDirectory->delete(
-            $this->mediaDirectory->getRelativePath($this->imagesHelper->getStorageRoot() . '/' . $directoryName)
-        );
-        $this->mediaDirectory->delete('secondDir');
-        $scopeConfig = $this->objectManager->get(\Magento\Framework\App\Config\MutableScopeConfigInterface::class);
-        $scopeConfig->setValue(
-            self::MEDIA_GALLERY_IMAGE_FOLDERS_CONFIG_PATH,
-            $this->origConfigValue
-        );
+        $this->responseFactory = $objectManager->get(ResponseFactory::class);
+        $this->model = $objectManager->get(\Magento\Cms\Controller\Adminhtml\Wysiwyg\Images\DeleteFolder::class);
     }
 
     /**
@@ -110,14 +70,21 @@ class DeleteFolderTest extends \PHPUnit\Framework\TestCase
      */
     public function testExecute()
     {
-        $directoryName = 'testDir/NewDirectory';
-        $path = $this->mediaDirectory->getRelativePath($this->fullDirectoryPath . $directoryName);
-        $this->mediaDirectory->create($path);
-        $this->model->getRequest()->setParams(['node' => $this->imagesHelper->idEncode($path)]);
+        $directoryName = DIRECTORY_SEPARATOR . 'NewDirectory';
+        $this->mediaDirectory->create(
+            $this->mediaDirectory->getRelativePath($this->fullDirectoryPath . $directoryName)
+        );
+        $this->model->getRequest()->setParams(['node' => $this->imagesHelper->idEncode($directoryName)]);
         $this->model->getRequest()->setMethod('POST');
         $this->model->execute();
 
-        $this->assertFalse($this->mediaDirectory->isExist($path));
+        $this->assertFalse(
+            $this->mediaDirectory->isExist(
+                $this->mediaDirectory->getRelativePath(
+                    $this->fullDirectoryPath . $directoryName
+                )
+            )
+        );
     }
 
     /**
@@ -129,10 +96,6 @@ class DeleteFolderTest extends \PHPUnit\Framework\TestCase
      */
     public function testExecuteWithLinkedMedia()
     {
-        if (!$this->mediaDirectory->getDriver() instanceof File) {
-            self::markTestSkipped('Remote storages like AWS S3 doesn\'t support symlinks');
-        }
-
         $linkedDirectory = $this->filesystem->getDirectoryWrite(DirectoryList::PUB);
         $linkedDirectoryPath =  $this->filesystem->getDirectoryRead(DirectoryList::PUB)
                 ->getAbsolutePath() . 'linked_media';
@@ -157,16 +120,11 @@ class DeleteFolderTest extends \PHPUnit\Framework\TestCase
      */
     public function testExecuteWithWrongDirectoryName()
     {
-        $secondDir = $this->mediaDirectory->getRelativePath($this->fullDirectoryPath . 'secondDir');
-        $this->mediaDirectory->create($secondDir);
-        $testDir = $this->mediaDirectory->getRelativePath($this->fullDirectoryPath . 'testDir');
-        $this->mediaDirectory->create($testDir);
-        $directoryName = 'testDir/../secondDir/';
-        $this->assertTrue($this->mediaDirectory->isExist($this->fullDirectoryPath . $directoryName));
+        $directoryName = '/../../etc/';
         $this->model->getRequest()->setParams(['node' => $this->imagesHelper->idEncode($directoryName)]);
         $this->model->execute();
 
-        $this->assertTrue($this->mediaDirectory->isExist($this->fullDirectoryPath . $directoryName));
+        $this->assertFileExists($this->fullDirectoryPath . $directoryName);
     }
 
     /**
@@ -178,10 +136,10 @@ class DeleteFolderTest extends \PHPUnit\Framework\TestCase
     public function testExecuteWithExcludedDirectoryName()
     {
         $directoryName = 'downloadable';
-        $expectedResponseMessage = 'We cannot delete the selected directory.';
+        $expectedResponseMessage = 'We cannot delete directory /downloadable.';
         $mediaDirectory = $this->filesystem->getDirectoryWrite(DirectoryList::MEDIA);
         $mediaDirectory->create($directoryName);
-        $this->assertTrue($this->mediaDirectory->isExist($this->fullDirectoryPath . $directoryName));
+        $this->assertFileExists($this->fullDirectoryPath . $directoryName);
 
         $this->model->getRequest()->setParams(['node' => $this->imagesHelper->idEncode($directoryName)]);
         $this->model->getRequest()->setMethod('POST');
@@ -191,7 +149,7 @@ class DeleteFolderTest extends \PHPUnit\Framework\TestCase
 
         $this->assertTrue($data['error']);
         $this->assertEquals($expectedResponseMessage, $data['message']);
-        $this->assertTrue($this->mediaDirectory->isExist($this->fullDirectoryPath . $directoryName));
+        $this->assertFileExists($this->fullDirectoryPath . $directoryName);
     }
 
     /**

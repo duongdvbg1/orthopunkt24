@@ -8,7 +8,6 @@ declare(strict_types=1);
 
 namespace Magento\MediaGallery\Model\Directory\Command;
 
-use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Framework\App\Filesystem\DirectoryList;
 use Magento\Framework\Exception\CouldNotDeleteException;
 use Magento\Framework\Exception\CouldNotSaveException;
@@ -19,29 +18,16 @@ use Magento\TestFramework\Helper\Bootstrap;
 
 /**
  * Test for CreateDirectoriesByPathsInterface
- *
- * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
  */
 class CreateByPathsTest extends \PHPUnit\Framework\TestCase
 {
-    private const MEDIA_GALLERY_IMAGE_FOLDERS_CONFIG_PATH
-        = 'system/media_storage_configuration/allowed_resources/media_gallery_image_folders';
-
-    /**
-     * @var array
-     */
-    private $origConfigValue;
-
     /**
      * Test directory name
      */
-    private const TEST_DIRECTORY_NAME = 'testDir/testCreateDirectory';
+    private const TEST_DIRECTORY_NAME = 'testCreateDirectory';
 
     /**
      * Absolute path to the media directory
-     */
-    /**
-     * @var \Magento\Framework\Filesystem\Directory\ReadInterface
      */
     private $mediaDirectoryPath;
 
@@ -56,52 +42,14 @@ class CreateByPathsTest extends \PHPUnit\Framework\TestCase
     private $deleteByPaths;
 
     /**
-     * @var \Magento\Framework\ObjectManagerInterface
-     */
-    private $objectManager;
-
-    /**
-     * @var \Magento\Framework\Filesystem\Directory\WriteInterface
-     */
-    private $mediaDirectory;
-
-    /**
      * @inheritdoc
      */
     protected function setUp(): void
     {
-        $this->objectManager = Bootstrap::getObjectManager();
-        $this->createByPaths = $this->objectManager->get(CreateDirectoriesByPathsInterface::class);
-        $this->deleteByPaths = $this->objectManager->get(DeleteDirectoriesByPathsInterface::class);
-        $this->mediaDirectory = $this->objectManager->get(Filesystem::class)
-            ->getDirectoryWrite(DirectoryList::MEDIA);
-        $this->mediaDirectoryPath = $this->objectManager->get(Filesystem::class)
+        $this->createByPaths = Bootstrap::getObjectManager()->get(CreateDirectoriesByPathsInterface::class);
+        $this->deleteByPaths = Bootstrap::getObjectManager()->get(DeleteDirectoriesByPathsInterface::class);
+        $this->mediaDirectoryPath = Bootstrap::getObjectManager()->get(Filesystem::class)
             ->getDirectoryRead(DirectoryList::MEDIA)->getAbsolutePath();
-        $this->mediaDirectory->create(
-            $this->mediaDirectory->getRelativePath($this->mediaDirectoryPath . '/testDir')
-        );
-        $config = $this->objectManager->get(ScopeConfigInterface::class);
-        $this->origConfigValue = $config->getValue(
-            self::MEDIA_GALLERY_IMAGE_FOLDERS_CONFIG_PATH,
-            'default'
-        );
-        $scopeConfig = $this->objectManager->get(\Magento\Framework\App\Config\MutableScopeConfigInterface::class);
-        $scopeConfig->setValue(
-            self::MEDIA_GALLERY_IMAGE_FOLDERS_CONFIG_PATH,
-            array_merge($this->origConfigValue, ['testDir']),
-        );
-    }
-
-    protected function tearDown(): void
-    {
-        $this->mediaDirectory->delete(
-            $this->mediaDirectory->getRelativePath($this->mediaDirectoryPath . '/testDir')
-        );
-        $scopeConfig = $this->objectManager->get(\Magento\Framework\App\Config\MutableScopeConfigInterface::class);
-        $scopeConfig->setValue(
-            self::MEDIA_GALLERY_IMAGE_FOLDERS_CONFIG_PATH,
-            $this->origConfigValue
-        );
     }
 
     /**
@@ -111,9 +59,9 @@ class CreateByPathsTest extends \PHPUnit\Framework\TestCase
     public function testCreateDirectory(): void
     {
         $this->createByPaths->execute([self::TEST_DIRECTORY_NAME]);
-        $this->assertTrue($this->mediaDirectory->isExist($this->mediaDirectoryPath . self::TEST_DIRECTORY_NAME));
+        $this->assertFileExists($this->mediaDirectoryPath . self::TEST_DIRECTORY_NAME);
         $this->deleteByPaths->execute([self::TEST_DIRECTORY_NAME]);
-        $this->assertFalse($this->mediaDirectory->isExist($this->mediaDirectoryPath . self::TEST_DIRECTORY_NAME));
+        $this->assertFileDoesNotExist($this->mediaDirectoryPath . self::TEST_DIRECTORY_NAME);
     }
 
     /**
@@ -154,14 +102,14 @@ class CreateByPathsTest extends \PHPUnit\Framework\TestCase
     public function testCreateChildDirectoryTheSameNameAsParentDirectory(): void
     {
         $dir = self::TEST_DIRECTORY_NAME;
-        $childPath = $dir . '/testCreateDirectory';
+        $childPath = $dir . '/' . $dir;
 
         $this->createByPaths->execute([$dir]);
-        $this->assertTrue($this->mediaDirectory->isExist($this->mediaDirectoryPath . $dir));
+        $this->assertFileExists($this->mediaDirectoryPath . $dir);
         $this->createByPaths->execute([$childPath]);
-        $this->assertTrue($this->mediaDirectory->isExist($this->mediaDirectoryPath . $childPath));
+        $this->assertFileExists($this->mediaDirectoryPath . $childPath);
         $this->deleteByPaths->execute([$dir]);
-        $this->assertFalse($this->mediaDirectory->isExist($this->mediaDirectoryPath . $dir));
+        $this->assertFileDoesNotExist($this->mediaDirectoryPath . $dir);
     }
 
     /**
@@ -172,7 +120,7 @@ class CreateByPathsTest extends \PHPUnit\Framework\TestCase
         $this->expectException(CouldNotSaveException::class);
 
         $this->createByPaths->execute([self::TEST_DIRECTORY_NAME]);
-        $this->assertTrue($this->mediaDirectory->isExist($this->mediaDirectoryPath . self::TEST_DIRECTORY_NAME));
+        $this->assertFileExists($this->mediaDirectoryPath . self::TEST_DIRECTORY_NAME);
         $this->createByPaths->execute([self::TEST_DIRECTORY_NAME]);
     }
 

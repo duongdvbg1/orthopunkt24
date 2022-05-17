@@ -42,7 +42,7 @@ class AddressesPostTest extends AbstractController
     /**
      * @magentoDataFixture Magento/Checkout/_files/quote_with_address.php
      */
-    public function testExecute()
+    public function testExecute(): void
     {
         $quote = $this->getQuote('test_order_1');
         $this->setMultiShippingToQuote($quote);
@@ -74,7 +74,7 @@ class AddressesPostTest extends AbstractController
     /**
      * @magentoDataFixture Magento/Checkout/_files/quote_with_address.php
      */
-    public function testExecuteFail()
+    public function testExecuteFail(): void
     {
         $msg = 'Verify the shipping address information and continue.';
 
