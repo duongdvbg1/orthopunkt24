@@ -258,6 +258,9 @@
 			display: none;
 		}
 	}
+	.product-item .actions-secondary .action.tocompare {
+		display: none !important;
+	}
 }
 
 // Shipping Support
@@ -1072,6 +1075,21 @@
 		li.result-selected{
 			&.highlighted{
 				color: @button__color;
+			}
+		}
+	}
+
+	.order-comment-block {
+		display: none;
+	}
+
+	#shipping-new-address-form {
+		display: flex;
+		flex-direction: column;
+		.field {
+			order: 1;
+			&[name='shippingAddress.firstname'] {
+				order: 0;
 			}
 		}
 	}
